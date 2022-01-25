@@ -66,7 +66,7 @@ class SongListFragment : Fragment(), SearchViewModel.Callbacks, SongListAdapter.
     }
 
     override fun onClickSongItem(song: Song) {
-        val action = SongListFragmentDirections.actionSearchFragmentToSearchDetailFragment()
+        val action = SongListFragmentDirections.actionSearchFragmentToSearchDetailFragment(song.id)
         findNavController().navigate(action)
     }
 

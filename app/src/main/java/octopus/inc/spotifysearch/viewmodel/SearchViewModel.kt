@@ -86,10 +86,10 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
             val song = Song(id, songName, artistsString, flow)
             callbacks?.addSongToAdapter(song)
-            i++
 
-            val href = response.tracks.href
-            Log.d(TAG, "Href $href")
+            Log.d(TAG, "Href ${response.tracks.items[i].availableMarkets}")
+
+            i++
         }
     }
 

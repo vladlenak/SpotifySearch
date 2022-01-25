@@ -21,9 +21,6 @@ import android.util.Log
 
 class LoginActivity : AppCompatActivity() {
 
-    private val CLIENT_ID = "6dd55bb0935d4d04906f220b8466aaf3"
-    private val REDIRECT_URI = "http://localhost:8080"
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -55,5 +52,8 @@ class LoginActivity : AppCompatActivity() {
 
     companion object {
         var SPOTIFY_ACCESS_TOKEN  = ""
+
+        private val CLIENT_ID = "6dd55bb0935d4d04906f220b8466aaf3"
+        private val REDIRECT_URI = "http://localhost:8080"
     }
 }

@@ -1,10 +1,8 @@
 package octopus.inc.spotifysearch.api
 
 import io.reactivex.Single
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.Headers
-import retrofit2.http.Query
+import octopus.inc.spotifysearch.model.TrackResponse
+import retrofit2.http.*
 
 interface ApiService {
     @Headers("Content-Type: application/json")
@@ -17,4 +15,12 @@ interface ApiService {
     @Query("limit") limit: String,
     @Query("offset") offset: String
     ): Single<SpotifyResponse>
+
+    @Headers("Content-Type: application/json")
+    @GET("tracks/{id}")
+    fun getTrack(
+        @Header("Authorization") authHeader: String,
+        @Path("id") id: String,
+        @Query("market") market: String
+    ): Single<TrackResponse>
 }
