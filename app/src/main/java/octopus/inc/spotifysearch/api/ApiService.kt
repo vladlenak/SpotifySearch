@@ -2,6 +2,7 @@ package octopus.inc.spotifysearch.api
 
 import io.reactivex.Single
 import octopus.inc.spotifysearch.model.TrackResponse
+import octopus.inc.spotifysearch.model.TrackSearchResponse
 import retrofit2.http.*
 
 interface ApiService {
@@ -14,7 +15,7 @@ interface ApiService {
     @Query("include_external") includeExternal: String,
     @Query("limit") limit: String,
     @Query("offset") offset: String
-    ): Single<SpotifyResponse>
+    ): Single<TrackSearchResponse>
 
     @Headers("Content-Type: application/json")
     @GET("tracks/{id}")

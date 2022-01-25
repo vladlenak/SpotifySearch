@@ -12,16 +12,15 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import octopus.inc.spotifysearch.SongListAdapter
-import octopus.inc.spotifysearch.api.Item
-import octopus.inc.spotifysearch.viewmodel.SearchViewModel
+import octopus.inc.spotifysearch.viewmodel.TrackListViewModel
 import octopus.inc.spotifysearch.databinding.FragmentSearchBinding
 import octopus.inc.spotifysearch.model.Song
 
-class SongListFragment : Fragment(), SearchViewModel.Callbacks, SongListAdapter.Callbacks {
+class TrackListFragment : Fragment(), TrackListViewModel.Callbacks, SongListAdapter.Callbacks {
 
     private lateinit var binding: FragmentSearchBinding
-    private val viewModel: SearchViewModel by lazy {
-        ViewModelProvider(this)[SearchViewModel::class.java]
+    private val viewModel: TrackListViewModel by lazy {
+        ViewModelProvider(this)[TrackListViewModel::class.java]
     }
     private lateinit var myAdapter: SongListAdapter
     private val compositeDisposable = CompositeDisposable()
@@ -66,7 +65,7 @@ class SongListFragment : Fragment(), SearchViewModel.Callbacks, SongListAdapter.
     }
 
     override fun onClickSongItem(song: Song) {
-        val action = SongListFragmentDirections.actionSearchFragmentToSearchDetailFragment(song.id)
+        val action = TrackListFragmentDirections.actionSearchFragmentToSearchDetailFragment(song.id)
         findNavController().navigate(action)
     }
 

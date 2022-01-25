@@ -1,8 +1,23 @@
 package octopus.inc.spotifysearch.model
 
-data class TrackResponse (
+data class TrackSearchResponse (
+    val tracks: Tracks
+)
+
+data class Tracks (
+    val href: String,
+    val items: List<Item>,
+    val limit: Long,
+    val next: String,
+    val offset: Long,
+    val previous: Any? = null,
+    val total: Long
+)
+
+data class Item (
     val album: Album,
     val artists: List<Artist>,
+    val availableMarkets: List<String>,
     val discNumber: Long,
     val durationMS: Long,
     val explicit: Boolean,
@@ -11,7 +26,6 @@ data class TrackResponse (
     val href: String,
     val id: String,
     val isLocal: Boolean,
-    val isPlayable: Boolean,
     val name: String,
     val popularity: Long,
     val previewURL: String,

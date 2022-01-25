@@ -2,23 +2,18 @@ package octopus.inc.spotifysearch.viewmodel
 
 import android.app.Application
 import android.util.Log
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import octopus.inc.spotifysearch.SpotifySearchApplication.Companion.api
-import octopus.inc.spotifysearch.R
 import octopus.inc.spotifysearch.activity.LoginActivity.Companion.SPOTIFY_ACCESS_TOKEN
-import octopus.inc.spotifysearch.api.Item
-import octopus.inc.spotifysearch.api.SpotifyResponse
+import octopus.inc.spotifysearch.model.TrackSearchResponse
 import octopus.inc.spotifysearch.db.SongRepository
 import octopus.inc.spotifysearch.model.Song
-import java.util.*
 
-class SearchViewModel(application: Application) : AndroidViewModel(application) {
+class TrackListViewModel(application: Application) : AndroidViewModel(application) {
 
     private var callbacks: Callbacks? = null
     private val compositeDisposable = CompositeDisposable()
@@ -43,7 +38,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         )
 
         compositeDisposable.add(requestList[0]
-            .subscribeOn(Schedulers.io())
+            .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 onResponse(it, 1)
@@ -55,36 +50,24 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
             .subscribe({
                 onResponse(it, 2)
             }, {}))
-
-        compositeDisposable.add(requestList[2]
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                onResponse(it, 3)
-            }, {}))
-
-        compositeDisposable.add(requestList[3]
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                onResponse(it, 4)
-            }, {}))
     }
 
-    private fun onResponse(response: SpotifyResponse, flow: Int) {
+    private fun onResponse(response: TrackSearchResponse, numberOfThread: Int) {
         val itemSize = response.tracks.items.size
+
         var i = 0
         while (i < itemSize) {
             val id = response.tracks.items[i].id
             val songName = response.tracks.items[i].name
             var artistsString = ""
+
             var j = 0
             while (j < response.tracks.items[i].artists.size) {
                 artistsString += " ${response.tracks.items[i].artists[j].name}"
                 j++
             }
 
-            val song = Song(id, songName, artistsString, flow)
+            val song = Song(id, songName, artistsString, numberOfThread)
             callbacks?.addSongToAdapter(song)
 
             Log.d(TAG, "Href ${response.tracks.items[i].availableMarkets}")

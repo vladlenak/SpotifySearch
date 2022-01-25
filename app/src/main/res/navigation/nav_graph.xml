@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/searchFragment"
-        android:name="octopus.inc.spotifysearch.fragment.SongListFragment"
+        android:name="octopus.inc.spotifysearch.fragment.TrackListFragment"
         android:label="@string/label_search_fragment"
         tools:layout="@layout/fragment_search">
 
@@ -24,7 +24,7 @@
 
     <fragment
         android:id="@+id/searchDetailFragment"
-        android:name="octopus.inc.spotifysearch.fragment.SongDetailFragment"
+        android:name="octopus.inc.spotifysearch.fragment.TrackFragment"
         android:label="@string/label_search_detail_fragment"
         tools:layout="@layout/fragment_search_detail">
 

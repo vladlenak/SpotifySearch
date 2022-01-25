@@ -1,7 +1,6 @@
 package octopus.inc.spotifysearch.fragment
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,20 +12,18 @@ import com.bumptech.glide.Glide
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import octopus.inc.spotifysearch.R
 import octopus.inc.spotifysearch.SpotifySearchApplication
 import octopus.inc.spotifysearch.activity.LoginActivity
 import octopus.inc.spotifysearch.databinding.FragmentSearchDetailBinding
-import octopus.inc.spotifysearch.viewmodel.SearchViewModel
-import octopus.inc.spotifysearch.viewmodel.SongDetailViewModel
+import octopus.inc.spotifysearch.viewmodel.TrackViewModel
 
-class SongDetailFragment : Fragment() {
+class TrackFragment : Fragment() {
 
     private lateinit var binding: FragmentSearchDetailBinding
-    private val viewModel: SongDetailViewModel by lazy {
-        ViewModelProvider(this)[SongDetailViewModel::class.java]
+    private val viewModel: TrackViewModel by lazy {
+        ViewModelProvider(this)[TrackViewModel::class.java]
     }
-    private val args: SongDetailFragmentArgs by navArgs()
+    private val args: TrackFragmentArgs by navArgs()
 
     private val compositeDisposable = CompositeDisposable()
 
