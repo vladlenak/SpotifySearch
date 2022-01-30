@@ -1,7 +1,6 @@
 package octopus.inc.spotifysearch.viewmodel
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import io.reactivex.Single
@@ -17,63 +16,54 @@ import octopus.inc.spotifysearch.api.model.TrackSearchResponse
 
 class TrackListViewModel(application: Application) : AndroidViewModel(application) {
 
-    private var callbacks: Callbacks? = null
     private val compositeDisposable = CompositeDisposable()
     private val songRepository = SongRepository.get()
 
-    val tracksLiveData = MutableLiveData<TrackSearchResponse>()
+    val track = MutableLiveData<Song>()
 
     override fun onCleared() {
         compositeDisposable.dispose()
-        callbacks = null
         super.onCleared()
     }
 
-    fun setCallbacks(callbacks: Callbacks) {
-        this.callbacks = callbacks
-    }
-
-    fun trackSource(search: String, offset: String): Single<TrackSearchResponse>? {
-        getSpotifyToken()?.let { token ->
-            return api?.search(token, search, "track", "audio", "10", offset)
-        }
-
-        return null
-    }
-
     fun search(search: String) {
-        val currentList = ArrayList<Song>()
-//        val requestList = listOf(
-//            api?.search(SPOTIFY_ACCESS_TOKEN, search, "track", "audio", "10", "0"),
-//            api?.search(SPOTIFY_ACCESS_TOKEN, search, "track", "audio", "10", "10"),
-//            api?.search(SPOTIFY_ACCESS_TOKEN, search, "track", "audio", "10", "20"),
-//            api?.search(SPOTIFY_ACCESS_TOKEN, search, "track", "audio", "10", "30")
-//        )
-
-        trackSource(search, "0")?.let {
-            compositeDisposable.add(it
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-
-                }, {}))
-        }
-
-
         getSpotifyToken()?.let { token ->
+            api?.search(token, search, "track", "audio", "10", "0")?.let {
+                compositeDisposable.add(it
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ trackSearchResponse ->
+                        val items = trackSearchResponse.tracks.items
+
+                        for (item in items) {
+                            getSong(item, 1)?.let { song ->
+                                track.value = song
+                            }
+                        }
+                    }, {
+
+                    }))
+            }
+
             api?.search(token, search, "track", "audio", "10", "10")?.let {
                 compositeDisposable.add(it
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        onResponse(it, 2)
+                    .subscribe({ trackSearchResponse ->
+                        val items = trackSearchResponse.tracks.items
+
+                        for (item in items) {
+                            getSong(item, 2)?.let { song ->
+                                track.value = song
+                            }
+                        }
                     }, {}))
             }
 
         }
     }
 
-    fun getSong(item: Item, flowNumber: Int): Song? {
+    private fun getSong(item: Item, flowNumber: Int): Song? {
         val id = item.id
         val name = item.name
         val artists = item.artists
@@ -83,36 +73,12 @@ class TrackListViewModel(application: Application) : AndroidViewModel(applicatio
             if (artistStr == null) {
                 artistStr = artist.name
             } else {
-                artistStr += ", $artist"
+                artistStr += ", ${artist.name}"
             }
         }
 
         return artistStr?.let {
             Song(id, name, it, flowNumber)
-        }
-    }
-
-    private fun onResponse(trackSearchResponse: TrackSearchResponse, numberOfThread: Int) {
-        val itemSize = trackSearchResponse.tracks.items.size
-
-        var i = 0
-        while (i < itemSize) {
-            val id = trackSearchResponse.tracks.items[i].id
-            val songName = trackSearchResponse.tracks.items[i].name
-            var artistsString = ""
-
-            var j = 0
-            while (j < trackSearchResponse.tracks.items[i].artists.size) {
-                artistsString += " ${trackSearchResponse.tracks.items[i].artists[j].name}"
-                j++
-            }
-
-            val song = Song(id, songName, artistsString, numberOfThread)
-            callbacks?.addSongToAdapter(song)
-
-            Log.d(TAG, "Href ${trackSearchResponse.tracks.items[i].availableMarkets}")
-
-            i++
         }
     }
 
@@ -126,10 +92,6 @@ class TrackListViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun getSongsFromDB(): Single<List<Song>> {
         return songRepository.getSongs()
-    }
-
-    interface Callbacks {
-        fun addSongToAdapter(song: Song)
     }
 
     companion object {

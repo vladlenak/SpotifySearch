@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,7 +19,7 @@ import octopus.inc.spotifysearch.viewmodel.TrackListViewModel
 import octopus.inc.spotifysearch.databinding.FragmentSearchBinding
 import octopus.inc.spotifysearch.db.model.Song
 
-class TrackListFragment : Fragment(), TrackListViewModel.Callbacks, SongListAdapter.Callbacks {
+class TrackListFragment : Fragment(), SongListAdapter.Callbacks {
 
     private lateinit var binding: FragmentSearchBinding
     private val viewModel: TrackListViewModel by lazy {
@@ -35,7 +36,7 @@ class TrackListFragment : Fragment(), TrackListViewModel.Callbacks, SongListAdap
 
         myAdapter = SongListAdapter(ArrayList(), requireContext())
         myAdapter.setCallbacks(this)
-        viewModel.setCallbacks(this)
+
 
         binding.searchList.layoutManager = LinearLayoutManager(context)
         binding.searchList.adapter = myAdapter
@@ -45,6 +46,20 @@ class TrackListFragment : Fragment(), TrackListViewModel.Callbacks, SongListAdap
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        compositeDisposable.add(viewModel.getSongsFromDB()
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                myAdapter.addSongList(it)
+            }, {}))
+
+        viewModel.track.observe(viewLifecycleOwner) {
+            myAdapter.addSong(it)
+            viewModel.addSongToDB(it)
+        }
+
+
 
         binding.searchEditText.setEndIconOnClickListener {
             viewModel.deleteAllFromDB()
@@ -65,21 +80,13 @@ class TrackListFragment : Fragment(), TrackListViewModel.Callbacks, SongListAdap
                     )
                 }
             }
-
         }
-
-        compositeDisposable.add(viewModel.getSongsFromDB()
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                myAdapter.addSongList(it)
-            }, {}))
     }
 
-    override fun addSongToAdapter(song: Song) {
-        myAdapter.addSong(song)
-        viewModel.addSongToDB(song)
-    }
+//    override fun addSongToAdapter(song: Song) {
+//        myAdapter.addSong(song)
+//        viewModel.addSongToDB(song)
+//    }
 
     override fun onClickSongItem(song: Song) {
         val action = TrackListFragmentDirections.actionSearchFragmentToSearchDetailFragment(song.id)
