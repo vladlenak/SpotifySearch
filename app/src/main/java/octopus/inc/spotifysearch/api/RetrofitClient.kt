@@ -10,7 +10,7 @@ object RetrofitClient {
 
     private var retrofit: Retrofit? = null
 
-    fun getRetrofit(baseUrl: String): Retrofit {
+    fun getRetrofit(baseUrl: String): Retrofit? {
         if (retrofit == null) {
             val httpLoggingInterceptor = HttpLoggingInterceptor()
             httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
@@ -25,10 +25,8 @@ object RetrofitClient {
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
-
-
         }
 
-        return retrofit!!
+        return retrofit
     }
 }

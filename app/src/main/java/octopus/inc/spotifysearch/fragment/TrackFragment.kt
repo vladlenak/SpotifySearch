@@ -14,6 +14,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import octopus.inc.spotifysearch.SpotifySearchApplication
 import octopus.inc.spotifysearch.activity.LoginActivity
+import octopus.inc.spotifysearch.activity.LoginActivity.Companion.getSpotifyToken
 import octopus.inc.spotifysearch.databinding.FragmentSearchDetailBinding
 import octopus.inc.spotifysearch.viewmodel.TrackViewModel
 
@@ -33,28 +34,25 @@ class TrackFragment : Fragment() {
     ): View {
         binding = FragmentSearchDetailBinding.inflate(inflater, container, false)
 
-
-
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        compositeDisposable.add(
-            SpotifySearchApplication.api.getTrack(LoginActivity.SPOTIFY_ACCESS_TOKEN, args.trackId, "UA")
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                binding.songName.text = it.name
-                binding.songArtist.text = it.artists[0].name
-                binding.songAlbum.text = it.album.name
-                loadImageIntoView(binding.songImage, it.album.images.get(0).url)
-            }, {}))
-
-//        binding.getTrackButton.setOnClickListener {
-//            viewModel.getTrack(args.trackId)
-//        }
+        getSpotifyToken()?.let { token ->
+            SpotifySearchApplication.api?.getTrack(token, args.trackId, "UA")?.let { trackResponse ->
+                compositeDisposable.add(trackResponse
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        binding.songName.text = it.name
+                        binding.songArtist.text = it.artists[0].name
+                        binding.songAlbum.text = it.album.name
+                        loadImageIntoView(binding.songImage, it.album.images.get(0).url)
+                    }, {}))
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -66,27 +64,5 @@ class TrackFragment : Fragment() {
         Glide.with(view.context)
             .load(url)
             .into(view)
-
-//        if (url.startsWith("gs://")) {
-//            val storageReference = Firebase.storage.getReferenceFromUrl(url)
-//            storageReference.downloadUrl
-//                .addOnSuccessListener { uri ->
-//                    val downloadUrl = uri.toString()
-//
-//                }
-//                .addOnFailureListener { e ->
-//                    Log.w(
-//                        TAG,
-//                        "Getting download url was not successful.",
-//                        e
-//                    )
-//                }
-//        } else {
-//            Glide.with(view.context).load(url).into(view)
-//        }
-    }
-
-    companion object {
-
     }
 }

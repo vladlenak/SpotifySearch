@@ -12,6 +12,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import octopus.inc.spotifysearch.SongListAdapter
+import octopus.inc.spotifysearch.SpotifySearchApplication
+import octopus.inc.spotifysearch.activity.LoginActivity
+import octopus.inc.spotifysearch.activity.LoginActivity.Companion.getSpotifyToken
 import octopus.inc.spotifysearch.viewmodel.TrackListViewModel
 import octopus.inc.spotifysearch.databinding.FragmentSearchBinding
 import octopus.inc.spotifysearch.model.Song
@@ -49,6 +52,21 @@ class TrackListFragment : Fragment(), TrackListViewModel.Callbacks, SongListAdap
             val userSearch = binding.searchEditText.editText?.text.toString()
             myAdapter.songList.clear()
             viewModel.search(userSearch)
+
+            getSpotifyToken()?.let { token ->
+                SpotifySearchApplication.api?.search(token, userSearch, "track", "audio", "10", "0")?.let {
+                    compositeDisposable.add(it
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+
+                        }, {
+
+                        })
+                    )
+                }
+            }
+
         }
 
         compositeDisposable.add(viewModel.getSongsFromDB()
@@ -72,9 +90,5 @@ class TrackListFragment : Fragment(), TrackListViewModel.Callbacks, SongListAdap
     override fun onDestroy() {
         super.onDestroy()
         compositeDisposable.dispose()
-    }
-
-    companion object {
-        private const val TAG = "SearchFragment"
     }
 }
