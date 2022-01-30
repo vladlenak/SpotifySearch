@@ -1,5 +1,7 @@
 package octopus.inc.spotifysearch.api
 
+import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.Single
 import octopus.inc.spotifysearch.api.model.TrackResponse
 import octopus.inc.spotifysearch.api.model.TrackSearchResponse
@@ -15,7 +17,7 @@ interface ApiService {
     @Query("include_external") includeExternal: String,
     @Query("limit") limit: String,
     @Query("offset") offset: String
-    ): Single<TrackSearchResponse>
+    ): Observable<TrackSearchResponse>
 
     @Headers("Content-Type: application/json")
     @GET("tracks/{id}")

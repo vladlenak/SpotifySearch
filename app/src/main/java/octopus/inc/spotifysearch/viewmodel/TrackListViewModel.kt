@@ -1,18 +1,22 @@
 package octopus.inc.spotifysearch.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.functions.BiFunction
+import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
 import octopus.inc.spotifysearch.SpotifySearchApplication.Companion.api
 import octopus.inc.spotifysearch.activity.LoginActivity.Companion.getSpotifyToken
 import octopus.inc.spotifysearch.api.model.Item
+import octopus.inc.spotifysearch.api.model.TrackSearchResponse
 import octopus.inc.spotifysearch.db.SongRepository
 import octopus.inc.spotifysearch.db.model.Song
-import octopus.inc.spotifysearch.api.model.TrackSearchResponse
 
 class TrackListViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -20,45 +24,98 @@ class TrackListViewModel(application: Application) : AndroidViewModel(applicatio
     private val songRepository = SongRepository.get()
 
     val track = MutableLiveData<Song>()
+    var totalTracks = 0
+    var isFirstFlowComplete = MutableLiveData<Boolean>()
+    var isSecondFlowComplete = MutableLiveData<Boolean>()
 
     override fun onCleared() {
         compositeDisposable.dispose()
         super.onCleared()
     }
 
-    fun search(search: String) {
+    fun search2(search: String) {
         getSpotifyToken()?.let { token ->
-            api?.search(token, search, "track", "audio", "10", "0")?.let {
-                compositeDisposable.add(it
+            val observable1 = api?.search(token, search, "track", "audio", "10", "0")
+
+
+            val observable2 = api?.search(token, search, "track", "audio", "10", "10")
+            val observable3 = api?.search(token, search, "track", "audio", "10", "20")
+            val observable4 = api?.search(token, search, "track", "audio", "10", "30")
+
+            compositeDisposable.add(
+                Observable.zip(observable1, observable2, BiFunction { t1, t2 ->
+                    val list: MutableList<Song> = ArrayList()
+                    totalTracks = t1.tracks.total.toInt()
+
+                    val items1 = t1.tracks.items
+
+                    for (item in items1) {
+                        getSong(item, 1)?.let { song ->
+                            list.add(song)
+                        }
+                    }
+
+                    val items2 = t2.tracks.items
+
+                    for (item in items2) {
+                        getSong(item, 2)?.let { song ->
+                            list.add(song)
+                        }
+                    }
+                    list
+                })
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ trackSearchResponse ->
-                        val items = trackSearchResponse.tracks.items
-
-                        for (item in items) {
-                            getSong(item, 1)?.let { song ->
-                                track.value = song
-                            }
+                    .subscribe({
+                        for (song in it) {
+                            track.value = song
                         }
                     }, {
 
-                    }))
-            }
+                    }, {
 
-            api?.search(token, search, "track", "audio", "10", "10")?.let {
-                compositeDisposable.add(it
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ trackSearchResponse ->
-                        val items = trackSearchResponse.tracks.items
+                    }, {
+                        if (totalTracks > 19) {
+                            compositeDisposable.add(
+                                Observable.zip(observable3, observable4, BiFunction { t1, t2 ->
+                                    val list: MutableList<Song> = ArrayList()
+                                    totalTracks = t1.tracks.total.toInt()
 
-                        for (item in items) {
-                            getSong(item, 2)?.let { song ->
-                                track.value = song
-                            }
+                                    val items1 = t1.tracks.items
+
+                                    for (item in items1) {
+                                        getSong(item, 3)?.let { song ->
+                                            list.add(song)
+                                        }
+                                    }
+
+                                    val items2 = t2.tracks.items
+
+                                    for (item in items2) {
+                                        getSong(item, 4)?.let { song ->
+                                            list.add(song)
+                                        }
+                                    }
+                                    list
+                                })
+                                    .subscribeOn(Schedulers.newThread())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe({
+                                        for (song in it) {
+                                            track.value = song
+                                        }
+                                    }, {
+
+                                    }, {
+
+                                    }, {
+
+                                    }))
                         }
-                    }, {}))
-            }
+                    }))
+
+
+
 
         }
     }
