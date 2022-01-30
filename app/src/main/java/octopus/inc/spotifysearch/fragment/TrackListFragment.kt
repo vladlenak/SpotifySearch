@@ -13,11 +13,10 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import octopus.inc.spotifysearch.SongListAdapter
 import octopus.inc.spotifysearch.SpotifySearchApplication
-import octopus.inc.spotifysearch.activity.LoginActivity
 import octopus.inc.spotifysearch.activity.LoginActivity.Companion.getSpotifyToken
 import octopus.inc.spotifysearch.viewmodel.TrackListViewModel
 import octopus.inc.spotifysearch.databinding.FragmentSearchBinding
-import octopus.inc.spotifysearch.model.Song
+import octopus.inc.spotifysearch.db.model.Song
 
 class TrackListFragment : Fragment(), TrackListViewModel.Callbacks, SongListAdapter.Callbacks {
 

@@ -2,9 +2,8 @@ package octopus.inc.spotifysearch.db
 
 import android.content.Context
 import androidx.room.Room
-import io.reactivex.Flowable
 import io.reactivex.Single
-import octopus.inc.spotifysearch.model.Song
+import octopus.inc.spotifysearch.db.model.Song
 import java.util.concurrent.Executors
 
 class SongRepository private constructor(context: Context) {

@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import octopus.inc.spotifysearch.databinding.ListItemSongBinding
-import octopus.inc.spotifysearch.model.Song
+import octopus.inc.spotifysearch.db.model.Song
 
 class SongListAdapter(var songList: ArrayList<Song>, val context: Context) :
     RecyclerView.Adapter<SongListAdapter.SongViewHolder>() {

@@ -1,9 +1,6 @@
-package octopus.inc.spotifysearch.model
+package octopus.inc.spotifysearch.db.model
 
 import androidx.room.*
-import androidx.room.OnConflictStrategy.IGNORE
-import com.google.android.material.circularreveal.CircularRevealHelper
-import java.util.*
 
 @Entity(tableName = "search_table")
 data class Song(

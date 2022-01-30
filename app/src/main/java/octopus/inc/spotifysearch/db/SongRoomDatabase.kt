@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import octopus.inc.spotifysearch.model.Song
+import octopus.inc.spotifysearch.db.model.Song
 
 @Database(entities = [Song::class], version = 1, exportSchema = true)
 abstract class SongRoomDatabase : RoomDatabase() {

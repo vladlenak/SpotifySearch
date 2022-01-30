@@ -1,8 +1,8 @@
 package octopus.inc.spotifysearch.api
 
 import io.reactivex.Single
-import octopus.inc.spotifysearch.model.TrackResponse
-import octopus.inc.spotifysearch.model.TrackSearchResponse
+import octopus.inc.spotifysearch.api.model.TrackResponse
+import octopus.inc.spotifysearch.api.model.TrackSearchResponse
 import retrofit2.http.*
 
 interface ApiService {

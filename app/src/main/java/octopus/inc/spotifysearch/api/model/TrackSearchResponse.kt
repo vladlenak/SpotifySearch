@@ -1,4 +1,4 @@
-package octopus.inc.spotifysearch.model
+package octopus.inc.spotifysearch.api.model
 
 data class TrackSearchResponse (
     val tracks: Tracks

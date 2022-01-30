@@ -6,7 +6,7 @@
 
         <variable
             name="song"
-            type="octopus.inc.spotifysearch.model.Song" />
+            type="octopus.inc.spotifysearch.db.model.Song" />
     </data>
 
     <com.google.android.material.card.MaterialCardView

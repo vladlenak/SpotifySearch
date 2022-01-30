@@ -2,12 +2,9 @@ package octopus.inc.spotifysearch.db
 
 import androidx.room.Dao
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.OnConflictStrategy.IGNORE
 import androidx.room.Query
-import io.reactivex.Flowable
 import io.reactivex.Single
-import octopus.inc.spotifysearch.model.Song
+import octopus.inc.spotifysearch.db.model.Song
 
 @Dao
 interface SongDao {

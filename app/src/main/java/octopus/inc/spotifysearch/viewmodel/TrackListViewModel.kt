@@ -10,16 +10,18 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import octopus.inc.spotifysearch.SpotifySearchApplication.Companion.api
 import octopus.inc.spotifysearch.activity.LoginActivity.Companion.getSpotifyToken
+import octopus.inc.spotifysearch.api.model.Item
 import octopus.inc.spotifysearch.db.SongRepository
-import octopus.inc.spotifysearch.model.Song
-import octopus.inc.spotifysearch.model.TrackSearchResponse
+import octopus.inc.spotifysearch.db.model.Song
+import octopus.inc.spotifysearch.api.model.TrackSearchResponse
 
 class TrackListViewModel(application: Application) : AndroidViewModel(application) {
 
     private var callbacks: Callbacks? = null
     private val compositeDisposable = CompositeDisposable()
     private val songRepository = SongRepository.get()
-    val trackList = MutableLiveData<TrackSearchResponse>()
+
+    val tracksLiveData = MutableLiveData<TrackSearchResponse>()
 
     override fun onCleared() {
         compositeDisposable.dispose()
@@ -40,6 +42,7 @@ class TrackListViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun search(search: String) {
+        val currentList = ArrayList<Song>()
 //        val requestList = listOf(
 //            api?.search(SPOTIFY_ACCESS_TOKEN, search, "track", "audio", "10", "0"),
 //            api?.search(SPOTIFY_ACCESS_TOKEN, search, "track", "audio", "10", "10"),
@@ -70,25 +73,44 @@ class TrackListViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    private fun onResponse(response: TrackSearchResponse, numberOfThread: Int) {
-        val itemSize = response.tracks.items.size
+    fun getSong(item: Item, flowNumber: Int): Song? {
+        val id = item.id
+        val name = item.name
+        val artists = item.artists
+        var artistStr: String? = null
+
+        for (artist in artists) {
+            if (artistStr == null) {
+                artistStr = artist.name
+            } else {
+                artistStr += ", $artist"
+            }
+        }
+
+        return artistStr?.let {
+            Song(id, name, it, flowNumber)
+        }
+    }
+
+    private fun onResponse(trackSearchResponse: TrackSearchResponse, numberOfThread: Int) {
+        val itemSize = trackSearchResponse.tracks.items.size
 
         var i = 0
         while (i < itemSize) {
-            val id = response.tracks.items[i].id
-            val songName = response.tracks.items[i].name
+            val id = trackSearchResponse.tracks.items[i].id
+            val songName = trackSearchResponse.tracks.items[i].name
             var artistsString = ""
 
             var j = 0
-            while (j < response.tracks.items[i].artists.size) {
-                artistsString += " ${response.tracks.items[i].artists[j].name}"
+            while (j < trackSearchResponse.tracks.items[i].artists.size) {
+                artistsString += " ${trackSearchResponse.tracks.items[i].artists[j].name}"
                 j++
             }
 
             val song = Song(id, songName, artistsString, numberOfThread)
             callbacks?.addSongToAdapter(song)
 
-            Log.d(TAG, "Href ${response.tracks.items[i].availableMarkets}")
+            Log.d(TAG, "Href ${trackSearchResponse.tracks.items[i].availableMarkets}")
 
             i++
         }
