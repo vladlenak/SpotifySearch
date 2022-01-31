@@ -1,5 +1,6 @@
 package octopus.inc.spotifysearch.api
 
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Single

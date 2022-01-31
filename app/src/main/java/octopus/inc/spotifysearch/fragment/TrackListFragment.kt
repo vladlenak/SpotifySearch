@@ -8,19 +8,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import octopus.inc.spotifysearch.SongListAdapter
-import octopus.inc.spotifysearch.api.model.TrackSearchResponse
 import octopus.inc.spotifysearch.databinding.FragmentSearchBinding
 import octopus.inc.spotifysearch.db.model.Song
 import octopus.inc.spotifysearch.viewmodel.TrackListViewModel
 
 class TrackListFragment : Fragment(), SongListAdapter.Callbacks {
-
+    
     private lateinit var binding: FragmentSearchBinding
     private val viewModel: TrackListViewModel by lazy {
         ViewModelProvider(this)[TrackListViewModel::class.java]
@@ -36,7 +33,6 @@ class TrackListFragment : Fragment(), SongListAdapter.Callbacks {
 
         myAdapter = SongListAdapter(ArrayList(), requireContext())
         myAdapter.setCallbacks(this)
-
 
         binding.searchList.layoutManager = LinearLayoutManager(context)
         binding.searchList.adapter = myAdapter
@@ -59,23 +55,11 @@ class TrackListFragment : Fragment(), SongListAdapter.Callbacks {
             viewModel.addSongToDB(it)
         }
 
-
-
         binding.searchEditText.setEndIconOnClickListener {
             viewModel.deleteAllFromDB()
             val userSearch = binding.searchEditText.editText?.text.toString()
             myAdapter.songList.clear()
-            viewModel.search2(userSearch)
-
-//            binding.searchList.visibility = View.INVISIBLE
-//
-//            viewModel.isFirstFlowComplete.observe(viewLifecycleOwner) { first ->
-//                viewModel.isSecondFlowComplete.observe(viewLifecycleOwner) { second ->
-//                    if (first == true && second == true) {
-//                        binding.searchList.visibility = View.VISIBLE
-//                    }
-//                }
-//            }
+            viewModel.search(userSearch, childFragmentManager)
         }
     }
 
@@ -87,5 +71,9 @@ class TrackListFragment : Fragment(), SongListAdapter.Callbacks {
     override fun onDestroy() {
         super.onDestroy()
         compositeDisposable.dispose()
+    }
+
+    companion object {
+        private const val TAG = "TrackListFragment"
     }
 }

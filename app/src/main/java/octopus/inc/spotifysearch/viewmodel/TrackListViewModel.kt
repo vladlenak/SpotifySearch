@@ -1,7 +1,7 @@
 package octopus.inc.spotifysearch.viewmodel
 
 import android.app.Application
-import android.util.Log
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import io.reactivex.Observable
@@ -9,12 +9,11 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
-import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
+import octopus.inc.spotifysearch.MyProgressDialog
 import octopus.inc.spotifysearch.SpotifySearchApplication.Companion.api
 import octopus.inc.spotifysearch.activity.LoginActivity.Companion.getSpotifyToken
 import octopus.inc.spotifysearch.api.model.Item
-import octopus.inc.spotifysearch.api.model.TrackSearchResponse
 import octopus.inc.spotifysearch.db.SongRepository
 import octopus.inc.spotifysearch.db.model.Song
 
@@ -25,19 +24,18 @@ class TrackListViewModel(application: Application) : AndroidViewModel(applicatio
 
     val track = MutableLiveData<Song>()
     var totalTracks = 0
-    var isFirstFlowComplete = MutableLiveData<Boolean>()
-    var isSecondFlowComplete = MutableLiveData<Boolean>()
+
+    private val dialog = MyProgressDialog()
 
     override fun onCleared() {
         compositeDisposable.dispose()
         super.onCleared()
     }
 
-    fun search2(search: String) {
+    fun search(search: String, childFragmentManager: FragmentManager) {
+        dialog.show(childFragmentManager, MyProgressDialog.TAG)
         getSpotifyToken()?.let { token ->
             val observable1 = api?.search(token, search, "track", "audio", "10", "0")
-
-
             val observable2 = api?.search(token, search, "track", "audio", "10", "10")
             val observable3 = api?.search(token, search, "track", "audio", "10", "20")
             val observable4 = api?.search(token, search, "track", "audio", "10", "30")
@@ -73,8 +71,6 @@ class TrackListViewModel(application: Application) : AndroidViewModel(applicatio
                     }, {
 
                     }, {
-
-                    }, {
                         if (totalTracks > 19) {
                             compositeDisposable.add(
                                 Observable.zip(observable3, observable4, BiFunction { t1, t2 ->
@@ -107,16 +103,16 @@ class TrackListViewModel(application: Application) : AndroidViewModel(applicatio
                                     }, {
 
                                     }, {
-
+                                        dialog.dismiss()
                                     }, {
 
                                     }))
+                        } else {
+                            dialog.dismiss()
                         }
+                    }, {
+
                     }))
-
-
-
-
         }
     }
 
