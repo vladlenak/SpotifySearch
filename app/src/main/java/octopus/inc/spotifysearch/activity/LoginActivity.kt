@@ -20,13 +20,10 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.login.setOnClickListener {
-            val builder =
-                AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI)
-            builder.setScopes(arrayOf("streaming"))
-            val request = builder.build()
+        login()
 
-            AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request)
+        binding.login.setOnClickListener {
+            login()
         }
     }
 
@@ -49,6 +46,15 @@ class LoginActivity : AppCompatActivity() {
                 else -> {}
             }
         }
+    }
+
+    private fun login() {
+        val builder =
+            AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI)
+        builder.setScopes(arrayOf("streaming"))
+        val request = builder.build()
+
+        AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request)
     }
 
     companion object {

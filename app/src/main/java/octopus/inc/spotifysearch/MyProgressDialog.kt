@@ -6,10 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import octopus.inc.spotifysearch.databinding.DialogFragmentMyProgressDialogBinding
-import octopus.inc.spotifysearch.fragment.TrackListFragment
-import octopus.inc.spotifysearch.viewmodel.TrackListViewModel
 
 class MyProgressDialog : DialogFragment() {
+
+    interface Callbacks {
+        fun onClickCancelButton()
+    }
+
+    private var callbacks: Callbacks? = null
 
     lateinit var binding: DialogFragmentMyProgressDialogBinding
 
@@ -20,6 +24,18 @@ class MyProgressDialog : DialogFragment() {
     ): View {
         binding = DialogFragmentMyProgressDialogBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.cancel.setOnClickListener {
+            callbacks?.onClickCancelButton()
+        }
+    }
+
+    fun setCallbacks(callbacks: Callbacks) {
+        this.callbacks = callbacks
     }
 
     companion object {
